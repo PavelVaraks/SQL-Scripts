@@ -1,0 +1,39 @@
+
+select 
+instance_id
+,message
+,run_date
+,(left(run_date,4)+'-'+replace(left(run_date,6),left(run_date,4),'')+'-'+RIGHT(run_date,2)) as DateНужная
+,dateadd(day,-1,convert(date,left(run_date,4)+'-'+replace(left(run_date,6),left(run_date,4),'')+'-'+RIGHT(run_date,2))) as Конвертируемая
+,replace(message,dateadd(day,-1,convert(date,left(run_date,4)+'-'+replace(left(run_date,6),left(run_date,4),'')+'-'+RIGHT(run_date,2))),(left(run_date,4)+'-'+replace(left(run_date,6),left(run_date,4),'')+'-'+RIGHT(run_date,2))) as НужныйТекст
+ from sysjobhistory(nolock)
+where job_id='7658F4F2-C077-4230-B82B-D33581EF38D3'
+and step_name='update'
+
+begin transaction
+declare @instance_id int
+declare db_cursor CURSOR FOR
+select instance_id from sysjobhistory(nolock)
+where job_id='1B697E48-321A-4013-AA32-A50827348842'
+and step_name='update'
+OPEN db_cursor
+FETCH NEXT FROM db_cursor INTO @instance_id
+WHILE @@FETCH_STATUS = 0
+Begin
+update sysjobhistory
+set message=(select 
+--instance_id
+--,message
+--,run_date
+--,(left(run_date,4)+'-'+replace(left(run_date,6),left(run_date,4),'')+'-'+RIGHT(run_date,2)) as DateНужная
+--,dateadd(day,-1,convert(date,left(run_date,4)+'-'+replace(left(run_date,6),left(run_date,4),'')+'-'+RIGHT(run_date,2))) as Конвертируемая
+replace(message,dateadd(day,-1,convert(date,left(run_date,4)+'-'+replace(left(run_date,6),left(run_date,4),'')+'-'+RIGHT(run_date,2))),(left(run_date,4)+'-'+replace(left(run_date,6),left(run_date,4),'')+'-'+RIGHT(run_date,2))) as НужныйТекст
+ from sysjobhistory(nolock)
+where instance_id=@instance_id)
+where instance_id=@instance_id
+FETCH NEXT FROM db_cursor INTO @instance_id
+END 
+CLOSE db_cursor 
+DEALLOCATE db_cursor
+
+commit transaction
