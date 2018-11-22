@@ -1,0 +1,23 @@
+#Инфа из AD
+#Get-ADComputer n5001-ais666 -Properties DNSHostName, Ipv4Address, OperatingSystem, Description,Created | ft DNSHostName, Ipv4Address, OperatingSystem, Description,Created
+#Состояние жестких дисков
+Invoke-Command -ComputerName n5001-ais666 -ScriptBlock {Get-CimInstance Win32_LogicalDisk |? $_.volumename -ne $true | ft deviceId,VolumeName,Size,FreeSpace}# -Property * | select -Property *}
+
+#Состояние CPU
+<#
+cls
+Invoke-Command -ComputerName n5001-ais666 -ScriptBlock {
+$property = "systemname","maxclockspeed","name","numberOfCores", "NumberOfLogicalProcessors","DeviceId"
+Get-WmiObject -class win32_processor -Property  *| select -Property * }
+#>
+
+
+#Состояние RAM
+<#
+$r=Invoke-Command -ComputerName n5001-ais666 -ScriptBlock {Get-CimInstance CIM_ComputerSystem | select @{name='FullName';expression={$_.name+'.'+$_.domain}},@{name='RAM';expression={$_.TotalPhysicalMemory/1024/1024/1024}},primaryOwnerName}
+$r
+$r.FullName
+$r.RAM
+$r.primaryOwnerName
+#>
+

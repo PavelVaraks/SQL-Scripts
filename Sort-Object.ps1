@@ -1,0 +1,1 @@
+﻿Get-Service | Sort-Object @{Expression = "Status"; Descending = $True}, @{Expression = "Name"; Descending = $False}

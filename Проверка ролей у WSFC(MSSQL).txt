@@ -1,0 +1,37 @@
+Import-Module FailoverClusters
+[string]$message
+[array]$OwnerNode=Get-ClusterGroup -Cluster "N5001-AIS506" | Where-Object {$_.IsCoreGroup -eq $false} | Get-ClusterOwnerNode
+[array]$CurrentOwner=Get-ClusterGroup -Cluster "N5001-AIS506" | Where-Object {$_.IsCoreGroup -eq $false}
+[string]$to="dbashift@fcod.nalog.ru"
+[string]$from="AlertSql@fcod.nalog.ru"
+[string]$SMTPServer="n5001-mail"
+IF (
+$OwnerNode.SyncRoot[0].ClusterObject.Name -eq $CurrentOwner.SyncRoot[0].Name -and $OwnerNode.SyncRoot[0].OwnerNodes[0].Name -ne $CurrentOwner.SyncRoot[0].OwnerNode.Name
+)
+{
+$Subject="Кластерный объект " + $OwnerNode.SyncRoot[0].ClusterObject.Name + " работает не на своём сервере!"
+$message="Кластерный объект " + $OwnerNode.SyncRoot[0].ClusterObject.Name + " работает не на своём сервере!<br><br>Предпочитаемый Владелец="$OwnerNode.SyncRoot[0].OwnerNodes[0].Name"<br> <br>Текущий Владелец="+$CurrentOwner.SyncRoot[0].OwnerNode.Name
+$bodyMail=$message+"
+<br> <br> <br> <br> Подробнее тут: http://confluence:8090/pages/viewpage.action?pageId=40830511"
+Send-MailMessage -From $from -Subject $Subject -To $to -Body $bodyMail -BodyAsHtml -Port 25 -Encoding UTF8 -SmtpServer $SMTPServer
+}
+IF (
+$OwnerNode.SyncRoot[1].ClusterObject.Name -eq $CurrentOwner.SyncRoot[1].Name -and $OwnerNode.SyncRoot[1].OwnerNodes[0].Name -ne $CurrentOwner.SyncRoot[1].OwnerNode.Name
+)
+{
+$Subject="Кластерный объект " + $OwnerNode.SyncRoot[1].ClusterObject.Name + " работает не на своём сервере!"
+$message="Кластерный объект " + $OwnerNode.SyncRoot[1].ClusterObject.Name + " работает не на своём сервере!<br><br>Предпочитаемый Владелец="$OwnerNode.SyncRoot[1].OwnerNodes[0].Name"<br> <br>Текущий Владелец="+$CurrentOwner.SyncRoot[1].OwnerNode.Name
+$bodyMail=$message+"
+<br> <br> <br> <br> Подробнее тут: http://confluence:8090/pages/viewpage.action?pageId=40830511"
+Send-MailMessage -From $from -Subject $Subject -To $to -Body $bodyMail -BodyAsHtml -Port 25 -Encoding UTF8 -SmtpServer $SMTPServer
+}
+IF (
+$OwnerNode.SyncRoot[2].ClusterObject.Name -eq $CurrentOwner.SyncRoot[2].Name -and $OwnerNode.SyncRoot[2].OwnerNodes[0].Name -ne $CurrentOwner.SyncRoot[2].OwnerNode.Name
+)
+{
+$Subject="Кластерный объект " + $OwnerNode.SyncRoot[2].ClusterObject.Name + " работает не на своём сервере!"
+$message="Кластерный объект " + $OwnerNode.SyncRoot[2].ClusterObject.Name + " работает не на своём сервере!<br><br>Предпочитаемый Владелец=" +$OwnerNode.SyncRoot[2].OwnerNodes[0].Name +"<br> <br> Текущий Владелец=" + $CurrentOwner.SyncRoot[2].OwnerNode.Name
+$bodyMail=$message+"
+<br> <br> <br> <br> Подробнее тут: http://confluence:8090/pages/viewpage.action?pageId=40830511"
+Send-MailMessage -From $from -Subject $Subject -To $to -Body $bodyMail -BodyAsHtml -Port 25 -Encoding UTF8 -SmtpServer $SMTPServer
+}
